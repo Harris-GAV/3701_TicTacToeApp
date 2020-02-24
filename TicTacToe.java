@@ -33,46 +33,60 @@ public class TicTacToe {
             players=Input.nextInt();
 
         if (players ==2){
-        while (good == false){
-            System.out.println("Enter size of board (3,5,7): ");
-            size=Input.nextInt(); 
-            if ((size%2==1)&&(size<8)){
-                good=true;
-            }else{
-                System.out.println("Not a proper board size (3,5,7)");
+            while (good == false){
+                System.out.println("Enter size of board (3,5,7): ");
+                size=Input.nextInt(); 
+                if ((size%2==1)&&(size<8)){
+                    good=true;
+                }else{
+                    System.out.println("Not a proper board size (3,5,7)");
+                }
+            }
+            Points[] state = new Points [size*size];
+            makeArray(index,state,size);
+
+            if (PvPgameLoop(size,board,state)==1){
+                System.out.println("");
+                System.out.println("PLAYER 1 WINS !!!!!!");
+                board.makeboard(size, board, state);
+                System.out.println("PLAYER 1 WINS !!!!!!");
+
+            }
+            if (PvPgameLoop(size,board,state)==2){
+                System.out.println("");
+                System.out.println("PLAYER 2 WINS !!!!!!");
+                board.makeboard(size, board, state);
+                System.out.println("PLAYER 2 WINS !!!!!!");       
+            }
+            if (PvPgameLoop(size,board,state)==0){
+                System.out.println("");
+                System.out.println("TIED !!!!!!");
             }
         }
-        Points[] state = new Points [size*size];
-        makeArray(index,state,size);
-        for(int i=0;i<3;++i){
-        PvPgameLoop(size,board,state);
-        board.makeboard(size, board, state);
-        }
-        }
-        //board.makeboard(size,board,state);
     
     }   
 void makeArray(Integer index,Points[] state,Integer size){
     Points temp = new Points(0,0,'/');   
     for (int i=0;i<size;++i){
-            for (int j=0;j<size;++j){
-               temp = new Points(i,j,' ');
-                state[index++] = temp;
-            }
-        }  
+        for (int j=0;j<size;++j){
+            temp = new Points(i,j,' ');
+            state[index++] = temp;
+        }
+    }  
 }       
 Integer PvPgameLoop(Integer size, Board board,Points[] state){
-    board.makeboard(size,board,state);   
-    Points temp =new Points(0,0,'X');
-    state[0]=temp;
     board.makeboard(size, board, state);
-    p1Turn(size,state,board);
-    if (gameEnd(state,board)==true){
-        return 1;
-    }
-    p2Turn(size,state,board);
-    if (gameEnd(state,board)==true){
-        return 2;
+    for (int i=0;i<size*size;++i){
+        p1Turn(size,state,board);
+        if (gameEnd(state)==true){
+            return 1;
+        }
+        board.makeboard(size, board, state);
+        p2Turn(size,state,board);
+        if (gameEnd(state)==true){
+            return 2;
+        }
+        board.makeboard(size, board, state);
     }
     return 0;
 }
@@ -87,7 +101,8 @@ void p1Turn(Integer size,Points[] state,Board board){
         if (checkIfOpen(x,y,state)==true){
             good = false;
         }else{
-        System.out.println("Not a valid point try again");
+            board.makeboard(size, board, state);
+            System.out.println("Not a valid point try again");
         }
     }
     Points insert= new Points(x,y,'X');
@@ -122,50 +137,31 @@ void p2Turn(Integer size,Points[] state,Board board){
     Scanner Input = new Scanner(System.in);
     Boolean good=true;
     while (good==true){
-        System.out.println("Player 2: Enter a point to place an 'X':");
+        System.out.println("Player 2: Enter a point to place an 'O':");
         x= Input.nextInt()-1;
         y= Input.nextInt()-1;
         if (checkIfOpen(x,y,state)==true){
             good = false;
         }else{
+        board.makeboard(size, board, state);
         System.out.println("Not a valid point try again");
         }
     }
     Points insert= new Points(x,y,'O');
     state[findLoc(x,y,state)]=insert;
     }
-    Boolean gameEnd(Points[] state,Board board){
-        char[] [] testArray =new char[size] [size];
-        char one='.',two='.',three='.';
-        Boolean hor,vert,diag;
-        for (int i=0;i<size*size;++i){
-            Points temp;
-            temp= state[i];
-            testArray[temp.getX()] [temp.getY()]=temp.getState();
-            
-        }   
-        for (int i=0; i<size; ++i){
-            for (int j=0;j<size;++j){
-                three=two;
-                two=one;
-                one=testArray[i] [j];
-
-                System.out.print(one+" "+two+" "+three);
-            if ((one==two)&&(two==three)){
-                hor=true;
-                
-            }else{
-                System.out.println("false");
-            }
-            one='.';
-            two='.';
-            three='.';
-            }
-            
+    Boolean gameEnd(Points[] state){
+        gameEnd end =new gameEnd();
+        if (size==3){
+            return  end.gameEnd3(state, size);
         }
-     
-        return true;
+        if (size==5){
+            return end.gameEnd5(state, size);
+        }
+        if (size==7){
+            return end.gameEnd7(state, size);
+        }
+        return false;
     }
-            
 }
         
