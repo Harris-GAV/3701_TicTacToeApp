@@ -8,11 +8,12 @@ package tic.tac.toe;
 
 
 import java.util.Objects;
+import java.util.Random;
 import java.util.Scanner;
 public class TicTacToe {
 
-     Integer size=0;
-    
+     
+
    
     public static void main(String[] args) {
         new TicTacToe().start();
@@ -20,152 +21,115 @@ public class TicTacToe {
     }
     void start(){
         Board board = new Board();
-
+        otherFunc size =new otherFunc();
         
         Boolean good = false; 
+        Boolean pvp= true;
         Scanner Input = new Scanner(System.in);
         int index=0;
         Integer players=0;
         System.out.println("--------Tic Tac Toe Game---------");
-
+        while ( !(players==1 || players==2) ){        
             System.out.println("Enter '1' for single player");
             System.out.println("Enter '2' for player vs player:");
             players=Input.nextInt();
-
+            if ( players!=1 && players!=2 ){
+                System.out.println("Not a '1' or '2' Enter the number of players");
+            }
+        }
         if (players ==2){
-        while (good == false){
-            System.out.println("Enter size of board (3,5,7): ");
-            size=Input.nextInt(); 
-            if ((size%2==1)&&(size<8)){
-                good=true;
-            }else{
-                System.out.println("Not a proper board size (3,5,7)");
+            while (good == false){
+                System.out.println("Enter size of board (3,5,7): ");
+                size.size=Input.nextInt(); 
+                if ((size.size%2==1)&&(size.size<8)){
+                    good=true;
+                }else{
+                    System.out.println("Not a proper board size (3,5,7)");
+                }
             }
-        }
-        Points[] state = new Points [size*size];
-        makeArray(index,state,size);
-        for(int i=0;i<3;++i){
-        PvPgameLoop(size,board,state);
-        board.makeboard(size, board, state);
-        }
-        }
-        //board.makeboard(size,board,state);
-    
-    }   
-void makeArray(Integer index,Points[] state,Integer size){
-    Points temp = new Points(0,0,'/');   
-    for (int i=0;i<size;++i){
-            for (int j=0;j<size;++j){
-               temp = new Points(i,j,' ');
-                state[index++] = temp;
-            }
-        }  
-}       
-Integer PvPgameLoop(Integer size, Board board,Points[] state){
-    board.makeboard(size,board,state);   
-    Points temp =new Points(0,0,'X');
-    state[0]=temp;
-    board.makeboard(size, board, state);
-    p1Turn(size,state,board);
-    if (gameEnd(state,board)==true){
-        return 1;
-    }
-    p2Turn(size,state,board);
-    if (gameEnd(state,board)==true){
-        return 2;
-    }
-    return 0;
-}
-void p1Turn(Integer size,Points[] state,Board board){
-    Integer x=0,y=0;
-    Scanner Input = new Scanner(System.in);
-    Boolean good=true;
-    while (good==true){
-        System.out.println("Player 1: Enter a point to place an 'X':");
-        x= Input.nextInt()-1;
-        y= Input.nextInt()-1;
-        if (checkIfOpen(x,y,state)==true){
-            good = false;
-        }else{
-        System.out.println("Not a valid point try again");
-        }
-    }
-    Points insert= new Points(x,y,'X');
-    state[findLoc(x,y,state)]=insert;
-}    
-    Boolean checkIfOpen(Integer x,Integer y,Points[] state ){
-        for(int i=0;i<size*size;++i){
-            Points temp5;
-            temp5=state[i];
-            Integer x1=temp5.getX();
-            Integer y1=temp5.getY();
-            if ( (x==x1) && (y==y1) && (temp5.getState()==' ') ){
-               return true;
-            }    
-        }  
-        return false;
-    }
-    Integer findLoc(Integer x,Integer y,Points[] state){
-        for(int i=0;i<size*size;++i){
-           Points temp5;
-            temp5=state[i];
-            Integer x1=temp5.getX();
-            Integer y1=temp5.getY();
-            if ( (x==x1) && (y==y1) ){
-                  return i;            
-            }
-        }
-        return -1;
-    }
-void p2Turn(Integer size,Points[] state,Board board){
-    Integer x=0,y=0;
-    Scanner Input = new Scanner(System.in);
-    Boolean good=true;
-    while (good==true){
-        System.out.println("Player 2: Enter a point to place an 'X':");
-        x= Input.nextInt()-1;
-        y= Input.nextInt()-1;
-        if (checkIfOpen(x,y,state)==true){
-            good = false;
-        }else{
-        System.out.println("Not a valid point try again");
-        }
-    }
-    Points insert= new Points(x,y,'O');
-    state[findLoc(x,y,state)]=insert;
-    }
-    Boolean gameEnd(Points[] state,Board board){
-        char[] [] testArray =new char[size] [size];
-        char one='.',two='.',three='.';
-        Boolean hor,vert,diag;
-        for (int i=0;i<size*size;++i){
-            Points temp;
-            temp= state[i];
-            testArray[temp.getX()] [temp.getY()]=temp.getState();
-            
-        }   
-        for (int i=0; i<size; ++i){
-            for (int j=0;j<size;++j){
-                three=two;
-                two=one;
-                one=testArray[i] [j];
+            Points[] state = new Points [size.size*size.size];
+            size.makeArray(index,state,size.size);
 
-                System.out.print(one+" "+two+" "+three);
-            if ((one==two)&&(two==three)){
-                hor=true;
+            for (int i=0;i<size.size*size.size;++i){
+                Integer game;
+                board.makeboard(size.size, board, state);
+                size.p1Turn( state, board);
+                game=size.PvPgameLoop( board, state);
+                if (size.exit(game,state,board,pvp)==true){
+                    return;
+                }
+                size.turncount++;
+                size.p2Turn( state, board);
+                game=size.PvPgameLoop( board, state);
+                if (size.exit(game,state,board,pvp)==true){
+                    return;
+                }
+                size.turncount++;
                 
-            }else{
-                System.out.println("false");
-            }
-            one='.';
-            two='.';
-            three='.';
             }
             
         }
-     
-        return true;
-    }
+        if (players==1){
+            size.size=3;
+            Points[] state = new Points[size.size*size.size];
+            size.makeArray(index, state, size.size);
+            Random random=new Random();
+            pvp=false;
+            Integer difficulty=0;
+            Integer firstTurn=2;//random.nextInt();
+            while(!(difficulty==2|| difficulty==1)){
+                System.out.println("Enter a difficulty (easy(1),hard(2)): ");
+                difficulty=Input.nextInt();
+                System.out.println(difficulty);
+                if (difficulty!=1 && difficulty!=2){
+                    System.out.println("Not a difficulty (1 or 2)");
+                }
+            }
             
+            System.out.println("");
+            if (firstTurn%2==1){
+                Npcs npc=new Npcs();
+                System.out.println("You go first");
+                for(int i=0;i<size.size*size.size;++i){
+                    Integer game;
+                    board.makeboard(size.size, board, state);
+                    size.p1Turn( state, board);
+                    game=size.PvPgameLoop( board, state);
+                    if (size.exit(game,state,board,!pvp)==true){
+                        return;
+                    }
+                    size.turncount++;
+                    npc.npcTurn( state, board,difficulty);
+                    game=size.PvPgameLoop( board, state);
+                    if (size.exit(game,state,board,!pvp)==true){
+                        return;
+                    }
+                    size.turncount++;
+                }
+            } else{
+                
+                Npcs npc =new Npcs();
+                System.out.println("You go second");
+                for(int i=0;i<size.size*size.size;++i){
+                    Integer game;
+ 
+                    npc.npcTurn( state, board,difficulty);
+                    game=size.PvPgameLoop( board, state);
+                    board.makeboard(size.size, board, state);
+
+                    if (size.exit(game,state,board,!pvp)==true){
+                        return;
+                    }
+                    size.turncount++;
+                    size.p1Turn( state, board);
+                    game=size.PvPgameLoop( board, state);
+                    if (size.exit(game,state,board,!pvp)==true){
+                        return;
+                    }
+                    size.turncount++;            
+                }
+            }
+        }
+    }   
 }
         
